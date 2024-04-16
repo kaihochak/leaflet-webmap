@@ -3,23 +3,44 @@ import './App.css'
 import MapComponent from '@/components/shared/MapComponent'
 import SideBar from '@/components/shared/SideBar'
 import EditMode from './components/shared/EditMode'
+import React, { useEffect } from 'react';
+import L from "leaflet";
+import "leaflet-draw";
+
 
 function App() {
-  const [mode, setMode] = useState('point')
+
+  useEffect(() => {
+    const map = L.map("map").setView([43,
+      -83.37146759033203], 14);
+
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const drawControl = new L.Control.Draw({
+      position: "topleft"
+    });
+
+
+    const drawn_items = L.featureGroup([]).addTo(map);
+
+    const layer_group = L.featureGroup([]).addTo(map);
+    map.addControl(drawControl);
+
+    map.on(L.Draw.Event.CREATED, function (event) {
+      let layer = event.layer;
+      drawn_items.addLayer(layer);
+    });
+  })
 
   return (
-    <>
-      <div className='w-full h-full' >
-        
-        <div id="main-container">
-          <MapComponent mode={mode} setMode={setMode}/>
-          <EditMode mode={mode} setMode={setMode}/>
-        </div>
-        
-        <SideBar/>
-      </div>
-    </>
-  )
+    <div>
+      {/* <div id="map" /> */}
+    </div>
+  );
 }
 
 export default App
