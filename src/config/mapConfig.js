@@ -16,6 +16,7 @@ export const MARKERS = [
     { id: 4, position: [53.544389, -113.490927], text: "West Edmonton Mall" },
     { id: 5, position: [51.178363, -115.570769], text: "Banff National Park" },
     { id: 6, position: [51.496846, -115.928056], text: "Jasper National Park" },
+    { id: 7, position: [52.13685974852633, -114.13696289062501], text: "Banff National Park" },
 ];
 
 export const CUSTOM_ICON = new Icon({

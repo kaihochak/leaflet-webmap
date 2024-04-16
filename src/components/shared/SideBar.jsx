@@ -5,7 +5,7 @@ import { IoCloseSharp } from "react-icons/io5";
 
 const SideBar = () => {
 
-  const [sidebarOpen, setSidebarOpen] = React.useState(true)
+  const [sidebarOpen, setSidebarOpen] = React.useState(false)
 
   const OpenSideBar = () => {
     return (
