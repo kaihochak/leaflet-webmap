@@ -1,49 +1,46 @@
 import React from 'react'
 import { BiMenuAltRight } from "react-icons/bi";
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { IoCloseSharp } from "react-icons/io5";
 
 const SideBar = () => {
 
-  const Searchbar = () => {
+  const [sidebarOpen, setSidebarOpen] = React.useState(true)
+
+  const OpenSideBar = () => {
     return (
-      <div className='w-full'>
-        <input type="text" placeholder="Search" />
+      <div className='flex-col flex-center gap-y-4'>
+
+        {/* Search bar */}
+        <div className='w-full flex-between gap-x-2'>
+          <Input id="name" placeholder="Search" />
+          {/* Close */}
+          <button className="text-primary text-[35px] " onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <IoCloseSharp/>
+          </button>
+        </div>
+
+        {/* Search Results */}
+
       </div>
+
     )
   }
 
   return (
-    <section id="sidebar">
-      <Sheet>
-        <SheetTrigger asChild>
-          <button >
-            <BiMenuAltRight className='text-[35px] text-primary'/>
-          </button>
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Edit profile</SheetTitle>
-            <SheetDescription>
-              Make changes to your profile here. Click save when you're done.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid items-center grid-cols-4 gap-4">
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid items-center grid-cols-4 gap-4">
-              <Input id="username" value="@peduarte" className="col-span-3" />
-            </div>
-          </div>
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button type="submit">Save changes</Button>
-            </SheetClose>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+    <section>
+
+      {/* close side bar */}
+      <div id="sidebar-close" className={`${!sidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
+        <button onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <BiMenuAltRight className="text-3xl text-primary" />
+        </button>
+      </div>
+
+      {/* open side bar */}
+      <div id="sidebar-open" className={`${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
+        <OpenSideBar />
+      </div>
     </section>
   )
 }

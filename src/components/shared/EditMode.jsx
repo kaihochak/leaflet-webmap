@@ -5,7 +5,7 @@ const EditMode = ({mode, setMode}) => {
     
     return (
         <section id="edit-panel" >
-            <Tabs defaultValue={mode} className="w-[300px]" onValueChange={(mode) => setMode(mode)}>
+            <Tabs defaultValue={mode} className="w-[400px]" onValueChange={(mode) => setMode(mode)}>
                 {/* <TabsContent value="point">Make changes to your account here.</TabsContent>
                 <TabsContent value="line">Change your password here.</TabsContent>
                 <TabsContent value="area">Change your password here.</TabsContent> */}

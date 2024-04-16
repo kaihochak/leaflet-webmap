@@ -12,11 +12,11 @@ function App() {
       <div className='w-full h-full' >
         
         <div id="main-container">
-          <MapComponent/>
+          <MapComponent mode={mode} setMode={setMode}/>
           <EditMode mode={mode} setMode={setMode}/>
         </div>
         
-        <SideBar mode={mode} setMode={setMode}/>
+        <SideBar/>
       </div>
     </>
   )
