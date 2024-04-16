@@ -16,10 +16,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 122 18% 20%; /* Dark Green */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 39 100% 83%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -75,12 +75,60 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply overflow-hidden bg-background text-foreground;
+  }
+}
+
+@layer components {
+  #main-container {
+    @apply relative flex;
+  }
+
+  #sidebar {
+    @apply absolute top-0 right-0 w-[60px] bg-white/90 h-full z-50 flex flex-col items-center justify-start pt-3;
+    /* @apply transition-transform duration-700 ease-in-out transform translate-x-[85%] shadow-lg hover:translate-x-0; */
+  }
+
+  /* #sidebar-open {
+    @apply hidden transition-all duration-700 ease-in-out opacity-0;
+  }
+  
+  #sidebar:hover #sidebar-open {
+    @apply flex opacity-100 ;
+  }
+
+  #sidebar-close {
+    @apply absolute top-0 left-0 cursor-pointer;
+  }
+
+  #sidebar:hover #sidebar-close {
+    @apply hidden;
+  } */
+
+  #edit-panel {
+    z-index: 1000;
+    @apply absolute bottom-0 left-0 p-4 m-4 rounded-lg shadow-lg bg-white/90; 
+  }
+
+  #map-container {
+    @apply z-30 w-full h-full;
   }
 }
 
 @layer utilities {
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  
   .marker-cluster {
     @apply bg-primary text-primary-foreground;
   }
+
+
 }

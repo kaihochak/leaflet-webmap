@@ -2,13 +2,21 @@ import { useState } from 'react'
 import './App.css'
 import MapComponent from '@/components/shared/MapComponent'
 import SideBar from '@/components/shared/SideBar'
+import EditMode from './components/shared/EditMode'
 
 function App() {
+  const [mode, setMode] = useState('point')
+
   return (
     <>
-      <div className='flex w-full'>
-        <SideBar/>
-        <MapComponent/>
+      <div className='w-full h-full' >
+        
+        <div id="main-container">
+          <MapComponent/>
+          <EditMode mode={mode} setMode={setMode}/>
+        </div>
+        
+        <SideBar mode={mode} setMode={setMode}/>
       </div>
     </>
   )
