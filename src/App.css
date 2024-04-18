@@ -100,7 +100,7 @@
   /* in the middle of the screen */
   #edit-panel {
     z-index: 1000;
-    @apply absolute bottom-0 p-4 m-10 transform -translate-x-1/2 border-2 rounded-lg shadow-lg left-1/2 border-border bg-secondary/90;
+    @apply absolute p-3 transform -translate-x-1/2 bg-white border-2 shadow-lg bottom-2 border-black/20 left-1/2;
   }
 
   #map-container {

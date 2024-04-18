@@ -1,5 +1,5 @@
-import { PropTypes } from 'prop-types';
 import Draw from 'leaflet-draw'; // eslint-disable-line
+import { PropTypes } from 'prop-types';
 import isEqual from 'fast-deep-equal';
 import React, { useRef, forwardRef } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
@@ -23,8 +23,51 @@ const eventHandlers = {
 
 const EditControl = forwardRef((props, ref) => {
   const context = useLeafletContext();
-  const drawRef = useRef();       // for the draw control
-  const propsRef = useRef(props); // for the props passed to the component
+  const drawRef = useRef();
+  const propsRef = useRef(props);
+
+  /********************************************************************************************************
+   * Listen to the events triggered by the Draw control
+   ********************************************************************************************************/
+
+  React.useEffect(() => {
+    const { map } = context;
+    const { onMounted } = props;
+
+    // register event handlers
+    for (const key in eventHandlers) {
+
+      map.on(eventHandlers[key], (evt) => {
+        
+        console.log('EditControl eventHandlers', evt);
+
+        let handlers = Object.keys(eventHandlers).filter(   // get the handlers
+          (handler) => eventHandlers[handler] === evt.type  // that match the event type
+        );
+
+        if (handlers.length === 1) {              
+          let handler = handlers[0];              
+          props[handler] && props[handler](evt);  
+        }
+      });
+    }
+
+    // Create the Draw control, onDrawCreate is called when a new feature is created
+    map.on(leaflet.Draw.Event.CREATED, onDrawCreate);
+    drawRef.current = createDrawElement(props, context);
+    map.addControl(drawRef.current);
+    onMounted && onMounted(drawRef.current);
+
+    return () => {
+      map.off(leaflet.Draw.Event.CREATED, onDrawCreate);
+      for (const key in eventHandlers) {
+        if (props[key]) {
+          map.off(eventHandlers[key], props[key]);
+        }
+      }
+      drawRef.current.remove(map);
+    };
+  }, []);
 
   // When a new feature is created, add it to the map
   const onDrawCreate = (e) => {
@@ -35,44 +78,12 @@ const EditControl = forwardRef((props, ref) => {
   };
 
   /********************************************************************************************************
-   * The useEffect hook is used to add event listeners to the map and to add the draw control to the map.
+   * Remount the EditControl component when the props change
    ********************************************************************************************************/
 
   React.useEffect(() => {
-    const { map } = context;      // get the map from the context
-    const { onMounted } = props;  // get the onMounted prop
 
-    // Add event listeners to the map
-    for (const key in eventHandlers) {
-      map.on(eventHandlers[key], (evt) => {                 // for each event handler
-        let handlers = Object.keys(eventHandlers).filter(   // get the handlers
-          (handler) => eventHandlers[handler] === evt.type  // that match the event type
-        );
-        if (handlers.length === 1) {              // if there is only one handler
-          let handler = handlers[0];              // get the handler
-          props[handler] && props[handler](evt);  // call the handler
-        }
-      });
-    }
-
-    map.on(leaflet.Draw.Event.CREATED, onDrawCreate);      // add the draw create event listener
-    drawRef.current = createDrawElement(props, context);   // create the draw control
-    map.addControl(drawRef.current);                       // add the draw control to the map
-    onMounted && onMounted(drawRef.current);               // call the onMounted prop
-
-    return () => {
-      map.off(leaflet.Draw.Event.CREATED, onDrawCreate);    // remove the draw create event listener
-      for (const key in eventHandlers) {                    // remove the event listeners
-        if (props[key]) {                                   // for each event handler
-          map.off(eventHandlers[key], props[key]);          // remove the event listener
-        }
-      }
-
-      drawRef.current.remove(map);                           // remove the draw control from the map
-    };
-  }, []);
-
-  React.useEffect(() => {
+    // If the props haven't changed, return
     if (
       isEqual(props.draw, propsRef.current.draw) &&
       isEqual(props.edit, propsRef.current.edit) &&
@@ -82,6 +93,7 @@ const EditControl = forwardRef((props, ref) => {
     }
     const { map } = context;
 
+    // if not, Update the propsRef
     drawRef.current.remove(map);
     drawRef.current = createDrawElement(props, context);
     drawRef.current.addTo(map);
@@ -98,7 +110,12 @@ const EditControl = forwardRef((props, ref) => {
 });
 
 
+/********************************************************************************************************
+ * creates a new instance of the Draw control.
+ ********************************************************************************************************/
+
 function createDrawElement(props, context) {
+
   const { layerContainer } = context;
   const { draw, edit, position } = props;
   const options = {
@@ -118,6 +135,10 @@ function createDrawElement(props, context) {
 
   return new Control.Draw(options);
 }
+
+/********************************************************************************************************
+ * the type of the props passed to the EditControl component 
+ ********************************************************************************************************/
 
 EditControl.propTypes = {
   ...Object.keys(eventHandlers).reduce((acc, val) => {

@@ -1,20 +1,15 @@
 import React from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 
-const EditMode = ({mode, setMode}) => {
-    
+const EditMode = ({ textMode, setTextMode }) => {
+
     return (
         <section id="edit-panel" >
-            <Tabs defaultValue={mode} className="w-[400px]" onValueChange={(mode) => setMode(mode)}>
-                {/* <TabsContent value="point">Make changes to your account here.</TabsContent>
-                <TabsContent value="line">Change your password here.</TabsContent>
-                <TabsContent value="area">Change your password here.</TabsContent> */}
-                <TabsList className="grid w-full grid-cols-3 bg-primary/90 text-primary-foreground">
-                    <TabsTrigger value="point">📍 Point</TabsTrigger>
-                    <TabsTrigger value="line">✏️ Line</TabsTrigger>
-                    <TabsTrigger value="area">🗺️ Area</TabsTrigger>
-                </TabsList>
-            </Tabs>
+            <div className="flex items-center space-x-2">
+                <Switch id="text-mode" checked={textMode} onCheckedChange={() => setTextMode(!textMode)} />
+                <Label htmlFor="text-mode">Text Mode</Label>
+            </div>
         </section>
     )
 }
