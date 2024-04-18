@@ -15,9 +15,11 @@ import { z } from "zod"
 
 function App() {
   const [textMode, setTextMode] = useState(true)
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [textLocation, setTextLocation] = React.useState([]);
-  const [textElements, setTextElements] = React.useState(MARKERS);  
+  const [features, setFeatures] = useState({
+    marker: [],
+    polyline: [],
+    polygon: []
+  })
 
   return (
     <>
@@ -25,12 +27,12 @@ function App() {
 
         {/* Main Component */}
         <div id="main-container">
-          <MapComponent textMode={textMode}/>
+          <MapComponent textMode={textMode} features={features} setFeatures={setFeatures}/>
           <EditMode textMode={textMode} setTextMode={setTextMode}/>
         </div>
 
         {/* Sidebar */}
-        <SideBar />
+        <SideBar features={features}/>
       </div>
     </>
   )
