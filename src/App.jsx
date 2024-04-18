@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 function App() {
-  const [textMode, setTextMode] = useState(false)
+  const [textMode, setTextMode] = useState(true)
   const [isOpen, setIsOpen] = React.useState(false);
   const [textLocation, setTextLocation] = React.useState([]);
   const [textElements, setTextElements] = React.useState(MARKERS);  

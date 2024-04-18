@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Polyline, Popup, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Polygon, Popup, FeatureGroup } from 'react-leaflet';
 import EditControl from '@/lib/EditControl';
 import { DEFAULT_POSITION, MARKERS, CUSTOM_ICON } from '@/config/mapConfig';
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { set, useForm } from "react-hook-form"
 import { z } from "zod"
 
 // Schema for the text input form
@@ -24,17 +24,12 @@ const FormSchema = z.object({
 
 const MapComponent = ({ textMode }) => {
 
-    const [isOpen, setIsOpen] = React.useState(false);
-    const [layerType, setLayerType] = React.useState('');
-    const [markers, setMarkers] = React.useState([]);
-    const [lines, setLines] = React.useState([]);
-    const [polygons, setPolygons] = React.useState([]);
-    const [textLocation, setTextLocation] = React.useState([]);
-    const [textElements, setTextElements] = React.useState({
-        markers: MARKERS,
-        lines: [],
-        polygons: [],
-    });
+    const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
+    const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
+    const [layerType, setLayerType] = React.useState('');               // type of feature
+    const [markers, setMarkers] = React.useState([]);                   // all markers 
+    const [lines, setLines] = React.useState([]);                       // all lines
+    const [polygons, setPolygons] = React.useState([]);                 // all polygons
 
     /************************************************************
      * Function to check input
@@ -45,12 +40,12 @@ const MapComponent = ({ textMode }) => {
     }, [layerType]);
 
     useEffect(() => {
-        console.log('textElements', textElements);
-    }, [textElements]);
-
-    useEffect(() => {
         console.log('markers', markers);
     }, [markers]);
+
+    useEffect(() => {
+        console.log('selectedLayer', selectedLayer);
+    }, [selectedLayer]);
 
     /************************************************************
      * Function to add text to a feature
@@ -63,9 +58,13 @@ const MapComponent = ({ textMode }) => {
         },
     })
 
-    const onSubmit = (data) => {
 
+    const onSubmitText = (data) => {
+                
         // get the newly created feature, add the text and update the state
+        selectedLayer.bindPopup(data.text).openPopup();      
+        
+        // update local state
         switch (layerType) {
             case 'marker':
                 let newFeature = markers[markers.length - 1];
@@ -99,21 +98,19 @@ const MapComponent = ({ textMode }) => {
     const _onCreated = (e) => {
         const type = e.layerType;
         const layer = e.layer;
+        setSelectedLayer(layer);    // store the selected layer, in case we want to add text
 
         let newFeature;
         switch (type) {
             case 'marker':
                 newFeature = { id: markers.length + 1, position: layer._latlng };
                 setMarkers(prevMarkers => [...prevMarkers, newFeature]);
-                setTextLocation(newFeature.position);
                 break;
             case 'polyline':
                 newFeature = { id: lines.length + 1, position: layer._latlngs };
                 setLines(prevLines => [...prevLines, newFeature]);
-                setTextLocation(newFeature.position);
                 break;
             case 'polygon':
-                console.log('_onCreated', layer._latlngs)
                 newFeature = { id: polygons.length + 1, position: layer._latlngs };
                 setPolygons(prevPolygons => [...prevPolygons, newFeature]);
                 break;
@@ -125,6 +122,30 @@ const MapComponent = ({ textMode }) => {
 
     const _onEditStart = (e) => {
         console.log('_onEditStart', e);
+    };
+
+    const _onEdited = (e) => {
+        console.log('_onEdited', e);
+        e.layers.eachLayer((layer) => {
+            let newFeature;
+            switch (layerType) {
+                case 'marker':
+                    newFeature = { id: markers.length + 1, position: layer._latlng };
+                    setMarkers(prevMarkers => [...prevMarkers, newFeature]);
+                    break;
+                case 'polyline':
+                    newFeature = { id: lines.length + 1, position: layer._latlngs };
+                    setLines(prevLines => [...prevLines, newFeature]);
+                    break;
+                case 'polygon':
+                    newFeature = { id: polygons.length + 1, position: layer._latlngs };
+                    setPolygons(prevPolygons => [...prevPolygons, newFeature]);
+                    break;
+                default:
+                    break;
+            }
+            setIsOpen(true);
+        });
     };
 
     /************************************************************
@@ -150,7 +171,7 @@ const MapComponent = ({ textMode }) => {
                     <EditControl
                         textMode={textMode}
                         position="bottomleft"
-                        // onEdited={_onEdited}
+                        onEdited={_onEdited}
                         onDrawStart={_onDrawStart}
                         onCreated={_onCreated}
                         // onDeleted={_onDeleted}
@@ -167,40 +188,7 @@ const MapComponent = ({ textMode }) => {
                             polygon: true,
                         }}
                     />
-
-
-
-
                 </FeatureGroup>
-                
-                {/* Text Popup for points*/}
-                {markers.map((marker, index) => (
-                    <Marker key={index} position={marker.position}>
-                        <Popup>
-                            {marker.text}
-                        </Popup>
-                    </Marker>
-                ))}
-
-
-                {/* Text Popup for lines */}
-                {lines.map((line, index) => (
-                    <Polyline key={index} positions={line.position}>
-                        <Popup>
-                            {line.text}
-                        </Popup>
-                    </Polyline>
-                ))}
-
-                {/* Text Popup for polygons */}
-                {polygons.map((polygon, index) => (
-                    <Polyline key={index} positions={polygon.position}>
-                        <Popup>
-                            {polygon.text}
-                        </Popup>
-                    </Polyline>
-                ))}
-
             </MapContainer>
 
             {/* Text Input Modal */}
@@ -208,14 +196,14 @@ const MapComponent = ({ textMode }) => {
                 <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
                     <DialogContent className="sm:max-w-[425px]">
                         <Form {...form} >
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col w-full gap-y-4">
+                            <form onSubmit={form.handleSubmit(onSubmitText)} className="flex flex-col w-full gap-y-4">
                                 <FormField
                                     control={form.control}
                                     name="text"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <Input placeholder="add your text" {...field} />
+                                                <Input placeholder="Add your text" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

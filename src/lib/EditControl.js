@@ -1,7 +1,7 @@
 import Draw from 'leaflet-draw'; // eslint-disable-line
 import { PropTypes } from 'prop-types';
 import isEqual from 'fast-deep-equal';
-import React, { useRef, forwardRef } from 'react';
+import React, { useRef } from 'react';
 import { useLeafletContext } from '@react-leaflet/core';
 import leaflet, { Map, Control } from 'leaflet';
 
@@ -21,7 +21,7 @@ const eventHandlers = {
 };
 
 
-const EditControl = forwardRef((props, ref) => {
+const EditControl = (props) => {
   const context = useLeafletContext();
   const drawRef = useRef();
   const propsRef = useRef(props);
@@ -107,7 +107,7 @@ const EditControl = forwardRef((props, ref) => {
   }, [props.draw, props.edit, props.position]);
 
   return null;
-});
+};
 
 
 /********************************************************************************************************
