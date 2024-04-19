@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
-import { BiMenuAltRight } from "react-icons/bi";
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Input } from "@/components/ui/input"
 import { IoCloseSharp } from "react-icons/io5";
 import debounce from "lodash.debounce";
@@ -47,52 +46,88 @@ import FeatureCard from '@/components/shared/FeatureCard'
 
 const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }) => {
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [features, setFeatures] = React.useState([]);
+    const [allFeatures, setAllFeatures] = React.useState([]);
+    const [searchResults, setSearchResults] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
 
+    const searchTermRef = useRef(searchTerm);  // Ref to store the current search term
+    searchTermRef.current = searchTerm;  // Update ref whenever searchTerm changes
+
+    
+    // Ref to track the current features for debounced function
+    const allFeaturesRef = useRef(allFeatures);
+
+    
     // convert parentFeatures to features by flatening the object
     useEffect(() => {
-        setFeatures(Object.values(parentFeatures).flat());
+        const flatFeatures = Object.values(parentFeatures).flat();
+        console.log('Flat features:', flatFeatures);
+        setAllFeatures(flatFeatures);
+        setSearchResults(flatFeatures); // Initialize searchResults with all features
+        allFeaturesRef.current = flatFeatures; // Update ref
     }, [parentFeatures]);
+
+
+    useEffect(() => {
+        console.log('allFeatures:', allFeatures);
+    }, [allFeatures]);
+
 
     /************************************************************
      * Functions for searching
      ************************************************************/
+
+    // Debounced search function to delay processing of search input
+    //  for possible implementation of API call / complex search in the future
+    const requestSearch = (searchTerm) => {
+        console.log('Searching for:', searchTerm.trim());
+        setLoading(true);
+        // filtering features based on search term
+        if (searchTerm.trim()) {
+            const filtered = filteredFeatures();
+            setSearchResults(filtered);
+        } else {
+            console.log('Search term is empty');
+            console.log('Resetting to original list', allFeatures);
+            // Reset to the original list when the search term is cleared
+            setSearchResults(allFeatures);
+        }
+        setLoading(false);
+    };
+
+    const debouncedSearch = useCallback(debounce((searchTerm) => {
+        requestSearch(searchTerm);
+    }, 300), [requestSearch]);
+
+    // Filter features based on search term
+    const filteredFeatures = () => {
+        console.log('Filtering features based on search term:', searchTerm);
+        if (!searchTerm) return allFeatures;       // Return all features if no search term
+        return allFeatures.filter((feature) => {
+
+            let test = feature.text.toLowerCase().includes(searchTerm.toLowerCase());
+            console.log('Feature:', feature.text, 'Test:', test, 'Search Term:', searchTerm);
+
+            return test;
+        });
+    };
 
     // Function to handle search input changes, with debouncing
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value.toLowerCase());
         debouncedSearch(event.target.value.toLowerCase());
     };
-    const debouncedSearch = useCallback(
-        (searchTerm) => requestSearch(searchTerm), []
-    );
-    const requestSearch = debounce((searchTerm) => {
-        console.log(searchTerm);
-        if (searchTerm && searchTerm.length > 0) {
-            setLoading(true);
-            // Call API to search features
-        }
-        setLoading(false);
-    });
 
-    // Filter features based on search term
-    const filteredFeatures = () => {
-        if (!searchTerm) return features;       // Return all features if no search term
-        
-        return features.filter((feature) => {
-            return feature.text?.toLowerCase().includes(searchTerm);
-        });
-    };
+    /************************************************************
+     * Search Results
+     ************************************************************/
 
-    // Search Results for each feature
     const SearchResults = () => {
-        const featureList = filteredFeatures();
         return (
             <div className='flex-col gap-y-4'>
-                {featureList.length === 0 ?
-                    <p>No results found</p> :
-                    featureList?.map((feature, index) => <FeatureCard key={index} feature={feature} />)
+                {searchResults.length === 0 ?
+                    <p>No features found</p> :
+                    searchResults.map((feature, index) => <FeatureCard key={index} feature={feature} />)
                 }
             </div>
         );
