@@ -5,19 +5,61 @@ import { IoCloseSharp } from "react-icons/io5";
 import debounce from "lodash.debounce";
 import FeatureCard from '@/components/shared/FeatureCard'
 
-const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen}) => {
+
+/********************************************************************************
+ * 
+ * The shape of the features object is as follows:
+ * 
+ * {
+ *     marker: [marker1, marker2, ...],
+ *     polyline: [polyline1, polyline2, ...],
+ *     polygon: [polygon1, polygon2, ...]
+ * }
+ * 
+ * After flattening the object, the features array will look like this:
+ * 
+ *      [marker1, marker2, polyline1, polyline2, polygon1, polygon2, ...]
+ * 
+ * Each feature object has the following essentail fields:
+ * 
+ * {
+ *    _leaflet_id: 1,
+ *    type: 'marker',
+ *    text: 'This is a marker',
+ *    _latlng: {lat: 0, lng: 0}
+ * }
+ * 
+ * {
+ *    _leaflet_id: 2,
+ *    type: 'polyline',
+ *    text: 'This is a polyline',
+ *    _latlngs: [{lat: 0, lng: 0}, {lat: 1, lng: 1}]
+ * }
+ * 
+ * {
+ *    _leaflet_id: 3,
+ *    type: 'polygon',
+ *    text: 'This is a polygon',
+ *    _latlngs: [[{lat: 0, lng: 0}, {lat: 1, lng: 1}, {lat: 2, lng: 2}]]
+ * }
+ * 
+ *********************************************************************************/
+
+const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }) => {
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [features, setFeatures] = React.useState(parentFeatures);
+    const [features, setFeatures] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
 
-    // Update features when parentFeatures change
+    // convert parentFeatures to features by flatening the object
     useEffect(() => {
-        console.log("parentFeatures", parentFeatures);
-        console.log("Object.values(parentFeatures).flat()", Object.values(parentFeatures).flat());
-        setFeatures(parentFeatures);
+        setFeatures(Object.values(parentFeatures).flat());
     }, [parentFeatures]);
 
-    // Function to handle search input changes
+    /************************************************************
+     * Functions for searching
+     ************************************************************/
+
+    // Function to handle search input changes, with debouncing
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value.toLowerCase());
         debouncedSearch(event.target.value.toLowerCase());
@@ -36,23 +78,24 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen})
 
     // Filter features based on search term
     const filteredFeatures = () => {
-        if (!searchTerm) return features;
-        return features.filter((feature) => {
-            // Assuming 'feature.text' or any other relevant property to match against
-            return feature.text.toLowerCase().includes(searchTerm);
+        if (!searchTerm) return features;       // Return all features if no search term
+        
+        return featureList = features.filter((feature) => {
+            return feature.text?.toLowerCase().includes(searchTerm);
         });
     };
 
     // Search Results for each feature
     const SearchResults = () => {
+        const featureList = filteredFeatures();
         return (
-            <div className='flex-col gap-y-4 '>
-                {Object.values(features).flat().length === 0 ?
-                    <p>No results found</p>
-                    : Object.values(features).flat().map((feature, index) => <FeatureCard key={index} feature={feature} />)
+            <div className='flex-col gap-y-4'>
+                {featureList.length === 0 ?
+                    <p>No results found</p> :
+                    featureList?.map((feature, index) => <FeatureCard key={index} feature={feature} />)
                 }
             </div>
-        )
+        );
     }
 
     /************************************************************
