@@ -95,11 +95,11 @@
   }
 
   #sidebar-close {
-    @apply border-0 border-border absolute p-6 top-0 right-0 w-[60px] bg-secondary-light/50 backdrop-blur-sm  h-full z-30 flex flex-col items-center justify-start;
+    @apply border-0 border-border absolute p-6 top-0 right-0 w-[60px] bg-white/70 backdrop-blur-sm  h-full z-30 flex flex-col items-center justify-start;
     @apply transition-transform duration-700 ease-in-out transform;
   }
   #sidebar-open {
-    @apply border-0 border-border absolute top-0 right-0 w-[420px] bg-secondary-light/50 backdrop-blur-sm h-full z-30 flex-col items-center justify-start;
+    @apply border-0 border-border absolute top-0 right-0 w-[420px] bg-white/70 backdrop-blur-sm h-full z-30 flex-col items-center justify-start;
     @apply overflow-y-auto transition-transform duration-700 ease-in-out transform;
   }
 

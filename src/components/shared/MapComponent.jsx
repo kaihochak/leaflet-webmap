@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Polyline, Polygon, Popup, FeatureGroup } from 'react-leaflet';
-import EditControl from '@/lib/EditControl';
+// import EditControl from '@/lib/EditControl';
+import { EditControl } from "react-leaflet-draw"
 import { DEFAULT_POSITION, MARKERS, CUSTOM_ICON } from '@/config/mapConfig';
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
-
+import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { set, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -56,15 +57,15 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     })
 
     const onSubmitText = (data) => {
-                
+
         // get the newly created feature, add the text and update the state
-        selectedLayer.bindPopup(data.text).openPopup();      
-        
+        selectedLayer.bindPopup(data.text).openPopup();
+
         // add a text property to the selected feature
-        setFeatures(prevFeatures => {                           
+        setFeatures(prevFeatures => {
             let updatedFeatures = { ...prevFeatures };          // copy the previous state
             // map through the same type and update the text of the selected feature
-            updatedFeatures[layerType] = updatedFeatures[layerType].map(feat => 
+            updatedFeatures[layerType] = updatedFeatures[layerType].map(feat =>
                 feat._leaflet_id === selectedLayer._leaflet_id ? { ...feat, text: data.text } : feat
             );
             return updatedFeatures;
@@ -77,7 +78,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
      ************************************************************/
 
     const _onDrawStart = (e) => {
-        setLayerType(e.layerType); 
+        setLayerType(e.layerType);
     };
 
     const _onCreated = (e) => {
@@ -86,7 +87,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         layer.type = layerType;     // Store the type of layer
         setSelectedLayer(layer);    // Store the selected layer
         setIsOpen(true);
-        
+
         // Updating state with the new feature
         setFeatures(prevFeatures => {
             const newFeature = { ...prevFeatures, [layerType]: [...prevFeatures[layerType], layer] };
@@ -101,12 +102,12 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     const _onEdited = (e) => {
         const { layers } = e;
         let layerType = Object.values(layers._layers)[0].type;      // has to be a better way to get the layerType
-        e.layers.eachLayer((layer) => {                                 
+        e.layers.eachLayer((layer) => {
             setFeatures(prevFeatures => {
                 let updatedFeatures = { ...prevFeatures };
                 // Update the appropriate feature array based on layerType
-                updatedFeatures[layerType] = updatedFeatures[layerType].map(feat => 
-                    feat.id === layer._leaflet_id ? {...feat, ...layer.toGeoJSON()} : feat
+                updatedFeatures[layerType] = updatedFeatures[layerType].map(feat =>
+                    feat.id === layer._leaflet_id ? { ...feat, ...layer.toGeoJSON() } : feat
                 );
                 return updatedFeatures;
             });
@@ -163,6 +164,9 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                     <DialogContent className="sm:max-w-[425px]">
                         <Form {...form} >
                             <form onSubmit={form.handleSubmit(onSubmitText)} className="flex flex-col w-full gap-y-4">
+
+                                <Label htmlFor="name">Description</Label>
+
                                 <FormField
                                     control={form.control}
                                     name="text"
@@ -176,7 +180,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                                     )}
                                 />
                                 <DialogFooter>
-                                    <Button type="submit">Save</Button>
+                                    <Button type="submit" className="bg-primary-dark">Save</Button>
                                 </DialogFooter>
                             </form>
                         </Form>
