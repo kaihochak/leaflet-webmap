@@ -80,7 +80,7 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
     const filteredFeatures = () => {
         if (!searchTerm) return features;       // Return all features if no search term
         
-        return featureList = features.filter((feature) => {
+        return features.filter((feature) => {
             return feature.text?.toLowerCase().includes(searchTerm);
         });
     };
