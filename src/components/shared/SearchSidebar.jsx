@@ -5,8 +5,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import debounce from "lodash.debounce";
 import FeatureCard from '@/components/shared/FeatureCard'
 
-const SearchSidebar = ({ features: parentFeatures }) => {
-    const [sidebarOpen, setSidebarOpen] = React.useState(true)
+const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen}) => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [features, setFeatures] = React.useState(parentFeatures);
     const [loading, setLoading] = React.useState(false);

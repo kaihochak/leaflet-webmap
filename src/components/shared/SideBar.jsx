@@ -20,7 +20,7 @@ const SideBar = ({ features }) => {
 
       {/* open side bar */}
       <div id="sidebar-open" className={`${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
-        <SearchSidebar features={features}/>
+        <SearchSidebar features={features} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
       </div>
     </section>
   )
