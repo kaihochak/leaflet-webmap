@@ -48,30 +48,13 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
     const [searchTerm, setSearchTerm] = React.useState('');
     const [allFeatures, setAllFeatures] = React.useState([]);
     const [searchResults, setSearchResults] = React.useState([]);
-    const [loading, setLoading] = React.useState(false);
-
-    const searchTermRef = useRef(searchTerm);  // Ref to store the current search term
-    searchTermRef.current = searchTerm;  // Update ref whenever searchTerm changes
-
-    
-    // Ref to track the current features for debounced function
-    const allFeaturesRef = useRef(allFeatures);
-
-    
+           
     // convert parentFeatures to features by flatening the object
     useEffect(() => {
         const flatFeatures = Object.values(parentFeatures).flat();
-        console.log('Flat features:', flatFeatures);
         setAllFeatures(flatFeatures);
         setSearchResults(flatFeatures); // Initialize searchResults with all features
-        allFeaturesRef.current = flatFeatures; // Update ref
     }, [parentFeatures]);
-
-
-    useEffect(() => {
-        console.log('allFeatures:', allFeatures);
-    }, [allFeatures]);
-
 
     /************************************************************
      * Functions for searching
@@ -80,37 +63,20 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
     // Debounced search function to delay processing of search input
     //  for possible implementation of API call / complex search in the future
     const requestSearch = (searchTerm) => {
-        console.log('Searching for:', searchTerm.trim());
-        setLoading(true);
-        // filtering features based on search term
-        if (searchTerm.trim()) {
-            const filtered = filteredFeatures();
+        // If search term is empty, reset search results to all features
+        if (!searchTerm.trim()) setSearchResults(allFeatures);
+        // Otherwise, filter features based on search term
+        else {
+            const filtered = allFeatures.filter(feature =>
+                feature.text.toLowerCase().includes(searchTerm.toLowerCase())
+            );
             setSearchResults(filtered);
-        } else {
-            console.log('Search term is empty');
-            console.log('Resetting to original list', allFeatures);
-            // Reset to the original list when the search term is cleared
-            setSearchResults(allFeatures);
         }
-        setLoading(false);
     };
 
     const debouncedSearch = useCallback(debounce((searchTerm) => {
         requestSearch(searchTerm);
     }, 300), [requestSearch]);
-
-    // Filter features based on search term
-    const filteredFeatures = () => {
-        console.log('Filtering features based on search term:', searchTerm);
-        if (!searchTerm) return allFeatures;       // Return all features if no search term
-        return allFeatures.filter((feature) => {
-
-            let test = feature.text.toLowerCase().includes(searchTerm.toLowerCase());
-            console.log('Feature:', feature.text, 'Test:', test, 'Search Term:', searchTerm);
-
-            return test;
-        });
-    };
 
     // Function to handle search input changes, with debouncing
     const handleSearchChange = (event) => {
