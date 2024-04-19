@@ -19,29 +19,6 @@ import FeatureCard from '@/components/shared/FeatureCard'
  * 
  *      [marker1, marker2, polyline1, polyline2, polygon1, polygon2, ...]
  * 
- * Each feature object has the following essentail fields:
- * 
- * {
- *    _leaflet_id: 1,
- *    type: 'marker',
- *    text: 'This is a marker',
- *    _latlng: {lat: 0, lng: 0}
- * }
- * 
- * {
- *    _leaflet_id: 2,
- *    type: 'polyline',
- *    text: 'This is a polyline',
- *    _latlngs: [{lat: 0, lng: 0}, {lat: 1, lng: 1}]
- * }
- * 
- * {
- *    _leaflet_id: 3,
- *    type: 'polygon',
- *    text: 'This is a polygon',
- *    _latlngs: [[{lat: 0, lng: 0}, {lat: 1, lng: 1}, {lat: 2, lng: 2}]]
- * }
- * 
  *********************************************************************************/
 
 const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }) => {

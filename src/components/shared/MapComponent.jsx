@@ -84,6 +84,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     const _onCreated = (e) => {
         console.log('_onCreated', e);
         const { layerType, layer } = e;
+        console.log('layer', layer.toGeoJSON());
         layer.type = layerType;     // Store the type of layer
         setSelectedLayer(layer);    // Store the selected layer
         setIsOpen(true);
@@ -99,12 +100,11 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         const { layers } = e;
         console.log('_onEdited', e);
         e.layers.eachLayer((layer) => {
-            console.log('layer', layer);
             setFeatures(prevFeatures => {
                 let updatedFeatures = { ...prevFeatures };
                 // Update the appropriate feature array based on layerType
-                updatedFeatures[layer.type] = updatedFeatures[layer.type].map(feat =>
-                    feat.id === layer._leaflet_id ? { ...feat, ...layer.toGeoJSON() } : feat
+                updatedFeatures[layer.type] = updatedFeatures[layer.type].map(feat => 
+                    feat._leaflet_id === layer._leaflet_id ? layer : feat
                 );
                 return updatedFeatures;
             });
