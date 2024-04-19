@@ -43,6 +43,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
 
     useEffect(() => {
         console.log('features', features);
+        console.log(features.map(feat => feat.toGeoJSON()));
     }, [features]);
 
     /************************************************************
@@ -56,18 +57,18 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         },
     })
 
+    // bind the text to the selected feature, 
+    // then push it to the properties field so we could use toGeoJSON() to get the feature
     const onSubmitText = (data) => {
-
-        // get the newly created feature, add the text and update the state
-        selectedLayer.bindPopup(data.text).openPopup();
-
-        // add a text property to the selected feature
-        setFeatures(prevFeatures => {
-            let updatedFeatures = { ...prevFeatures };          // copy the previous state
-            // map through the same type and update the text of the selected feature
-            updatedFeatures[layerType] = updatedFeatures[layerType].map(feat =>
-                feat._leaflet_id === selectedLayer._leaflet_id ? { ...feat, text: data.text } : feat
-            );
+        selectedLayer.bindPopup(data.text).openPopup();         // get the newly created feature, add the text and update the state
+        setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
+            let updatedFeatures = prevFeatures.map(feat => {
+                if (feat._leaflet_id === selectedLayer._leaflet_id) {
+                    if (!feat.feature) feat.feature = { type: 'Feature', properties: {} };  // add 
+                    else feat.feature.properties.text = data.text;                          // or update 
+                }
+                return feat;
+            });
             return updatedFeatures;
         });
         setIsOpen(false);
@@ -83,17 +84,11 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
 
     const _onCreated = (e) => {
         console.log('_onCreated', e);
-        const { layerType, layer } = e;
-        console.log('layer', layer.toGeoJSON());
-        layer.type = layerType;     // Store the type of layer
-        setSelectedLayer(layer);    // Store the selected layer
+        const { layer } = e;
+        setSelectedLayer(layer);            // Store the selected layer
         setIsOpen(true);
+        setFeatures(prevFeatures => [...prevFeatures, layer]);
 
-        // Updating state with the new feature
-        setFeatures(prevFeatures => {
-            const newFeature = { ...prevFeatures, [layerType]: [...prevFeatures[layerType], layer] };
-            return newFeature;
-        });
     };
 
     const _onEdited = (e) => {
@@ -103,7 +98,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
             setFeatures(prevFeatures => {
                 let updatedFeatures = { ...prevFeatures };
                 // Update the appropriate feature array based on layerType
-                updatedFeatures[layer.type] = updatedFeatures[layer.type].map(feat => 
+                updatedFeatures[layer.type] = updatedFeatures[layer.type].map(feat =>
                     feat._leaflet_id === layer._leaflet_id ? layer : feat
                 );
                 return updatedFeatures;

@@ -15,11 +15,7 @@ import { z } from "zod"
 
 function App() {
   const [textMode, setTextMode] = useState(true)
-  const [features, setFeatures] = useState({
-    marker: [],
-    polyline: [],
-    polygon: []
-  })
+  const [features, setFeatures] = useState([])
 
   return (
     <>
