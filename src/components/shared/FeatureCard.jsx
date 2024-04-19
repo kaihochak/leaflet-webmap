@@ -13,7 +13,7 @@ const FeatureCard = ({ feature }) => {
 
     let geojsonFeature = feature.toGeoJSON();
     let type = geojsonFeature.geometry.type;
-    let text = feature._popup?._content;
+    let text = geojsonFeature.properties.text;
     console.log(geojsonFeature);
     
 
@@ -34,6 +34,7 @@ const FeatureCard = ({ feature }) => {
                         <>Feature #{feature._leaflet_id}</>
                         { type === "Point" && <Badge className="bg-secondary">Point</Badge>}
                         { type === "LineString" && <Badge className="bg-accent">Line</Badge>}
+                        { type === "Polygon" && <Badge className="bg-primary">Polygon</Badge>}
                     </CardDescription>
                     <CardTitle >
                         <div className="grid items-center w-full gap-4">

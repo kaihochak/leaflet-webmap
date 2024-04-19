@@ -63,9 +63,10 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         selectedLayer.bindPopup(data.text).openPopup();         // get the newly created feature, add the text and update the state
         setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
             let updatedFeatures = prevFeatures.map(feat => {
+                // add or update the text property
                 if (feat._leaflet_id === selectedLayer._leaflet_id) {
-                    if (!feat.feature) feat.feature = { type: 'Feature', properties: {} };  // add 
-                    else feat.feature.properties.text = data.text;                          // or update 
+                    if (!feat.feature) feat.feature = { type: 'Feature', properties: { text: data.text } };
+                    else feat.feature.properties.text = data.text;                         
                 }
                 return feat;
             });
