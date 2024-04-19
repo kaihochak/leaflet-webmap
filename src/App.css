@@ -20,22 +20,28 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 122 18% 20%; /* Dark Green */
+    --primary: 122 30% 50%; /* Dark Green */
+    --primary-light: 122 30% 90%; /* Light Green */
+    --primary-dark: 122 30% 20%; /* Darker Green */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 56 10% 95%; /* Alasbaster */
+    --secondary: 60 40% 50%; /* Alasbaster */
+    --secondary-light: 60 40% 95%; /* Alasbaster */
+    --secondary-dark: 60 40% 60%; /* Alasbaster */
     --secondary-foreground: 222.2 30% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 195 40% 50%; /* Blue */
+    --accent-light: 210 40% 98%; /* Light Blue */
+    --accent-dark: 210 40% 94%; /* Dark Blue */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 122 18% 90%; /* Light Green */
+    --border: 0 0 90%; /* Light Gray */
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
@@ -89,18 +95,18 @@
   }
 
   #sidebar-close {
-    @apply border-2 border-border absolute p-6 top-0 right-0 w-[60px] bg-secondary/90 h-full z-30 flex flex-col items-center justify-start;
+    @apply border-0 border-border absolute p-6 top-0 right-0 w-[60px] bg-white/70 backdrop-blur-sm  h-full z-30 flex flex-col items-center justify-start;
     @apply transition-transform duration-700 ease-in-out transform;
   }
   #sidebar-open {
-    @apply border-2 border-border absolute p-6 top-0 right-0 w-[450px] bg-secondary/90 h-full z-30 flex-col items-center justify-start;
-    @apply transition-transform duration-700 ease-in-out transform;
+    @apply border-0 border-border absolute top-0 right-0 w-[420px] bg-white/70 backdrop-blur-sm h-full z-30 flex-col items-center justify-start;
+    @apply overflow-y-auto transition-transform duration-700 ease-in-out transform;
   }
 
   /* in the middle of the screen */
   #edit-panel {
     z-index: 1000;
-    @apply absolute p-3 transform -translate-x-1/2 bg-white border-2 shadow-lg bottom-2 border-black/20 left-1/2;
+    @apply absolute p-3 transform -translate-x-1/2 bg-white border-2 shadow-lg bottom-2 border-border left-1/2;
   }
 
   #map-container {
@@ -118,7 +124,6 @@
     @apply flex items-center justify-between;
   }
 
-  
   .marker-cluster {
     @apply bg-primary text-primary-foreground;
   }

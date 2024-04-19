@@ -20,7 +20,6 @@ const eventHandlers = {
   onDeleteStop: 'draw:deletestop',
 };
 
-
 const EditControl = (props) => {
   const context = useLeafletContext();
   const drawRef = useRef();
@@ -39,7 +38,7 @@ const EditControl = (props) => {
 
       map.on(eventHandlers[key], (evt) => {
         
-        console.log('EditControl eventHandlers', evt);
+        // console.log('EditControl eventHandlers', evt);
 
         let handlers = Object.keys(eventHandlers).filter(   // get the handlers
           (handler) => eventHandlers[handler] === evt.type  // that match the event type
