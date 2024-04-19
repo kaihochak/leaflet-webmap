@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
-import { BiMenuAltRight } from "react-icons/bi";
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Input } from "@/components/ui/input"
 import { IoCloseSharp } from "react-icons/io5";
 import debounce from "lodash.debounce";
@@ -20,79 +19,58 @@ import FeatureCard from '@/components/shared/FeatureCard'
  * 
  *      [marker1, marker2, polyline1, polyline2, polygon1, polygon2, ...]
  * 
- * Each feature object has the following essentail fields:
- * 
- * {
- *    _leaflet_id: 1,
- *    type: 'marker',
- *    text: 'This is a marker',
- *    _latlng: {lat: 0, lng: 0}
- * }
- * 
- * {
- *    _leaflet_id: 2,
- *    type: 'polyline',
- *    text: 'This is a polyline',
- *    _latlngs: [{lat: 0, lng: 0}, {lat: 1, lng: 1}]
- * }
- * 
- * {
- *    _leaflet_id: 3,
- *    type: 'polygon',
- *    text: 'This is a polygon',
- *    _latlngs: [[{lat: 0, lng: 0}, {lat: 1, lng: 1}, {lat: 2, lng: 2}]]
- * }
- * 
  *********************************************************************************/
 
 const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }) => {
     const [searchTerm, setSearchTerm] = React.useState('');
-    const [features, setFeatures] = React.useState([]);
-    const [loading, setLoading] = React.useState(false);
-
+    const [allFeatures, setAllFeatures] = React.useState([]);
+    const [searchResults, setSearchResults] = React.useState([]);
+           
     // convert parentFeatures to features by flatening the object
     useEffect(() => {
-        setFeatures(Object.values(parentFeatures).flat());
+        const flatFeatures = Object.values(parentFeatures).flat();
+        setAllFeatures(flatFeatures);
+        setSearchResults(flatFeatures); // Initialize searchResults with all features
     }, [parentFeatures]);
 
     /************************************************************
      * Functions for searching
      ************************************************************/
 
+    // Debounced search function to delay processing of search input
+    //  for possible implementation of API call / complex search in the future
+    const requestSearch = (searchTerm) => {
+        // If search term is empty, reset search results to all features
+        if (!searchTerm.trim()) setSearchResults(allFeatures);
+        // Otherwise, filter features based on search term
+        else {
+            const filtered = allFeatures.filter(feature =>
+                feature.text.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setSearchResults(filtered);
+        }
+    };
+
+    const debouncedSearch = useCallback(debounce((searchTerm) => {
+        requestSearch(searchTerm);
+    }, 300), [requestSearch]);
+
     // Function to handle search input changes, with debouncing
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value.toLowerCase());
         debouncedSearch(event.target.value.toLowerCase());
     };
-    const debouncedSearch = useCallback(
-        (searchTerm) => requestSearch(searchTerm), []
-    );
-    const requestSearch = debounce((searchTerm) => {
-        console.log(searchTerm);
-        if (searchTerm && searchTerm.length > 0) {
-            setLoading(true);
-            // Call API to search features
-        }
-        setLoading(false);
-    });
 
-    // Filter features based on search term
-    const filteredFeatures = () => {
-        if (!searchTerm) return features;       // Return all features if no search term
-        
-        return features.filter((feature) => {
-            return feature.text?.toLowerCase().includes(searchTerm);
-        });
-    };
+    /************************************************************
+     * Search Results
+     ************************************************************/
 
-    // Search Results for each feature
     const SearchResults = () => {
-        const featureList = filteredFeatures();
         return (
             <div className='flex-col gap-y-4'>
-                {featureList.length === 0 ?
-                    <p>No results found</p> :
-                    featureList?.map((feature, index) => <FeatureCard key={index} feature={feature} />)
+                {searchResults.length === 0 ?
+                    <p>No features found</p> :
+                    searchResults.map((feature, index) => <FeatureCard key={index} feature={feature} />)
                 }
             </div>
         );

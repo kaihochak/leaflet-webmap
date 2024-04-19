@@ -84,6 +84,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     const _onCreated = (e) => {
         console.log('_onCreated', e);
         const { layerType, layer } = e;
+        console.log('layer', layer.toGeoJSON());
         layer.type = layerType;     // Store the type of layer
         setSelectedLayer(layer);    // Store the selected layer
         setIsOpen(true);
@@ -95,24 +96,33 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         });
     };
 
-    const _onEditStart = (e) => {
-        console.log('_onEditStart', e);
-    };
-
     const _onEdited = (e) => {
         const { layers } = e;
-        let layerType = Object.values(layers._layers)[0].type;      // has to be a better way to get the layerType
+        console.log('_onEdited', e);
         e.layers.eachLayer((layer) => {
             setFeatures(prevFeatures => {
                 let updatedFeatures = { ...prevFeatures };
                 // Update the appropriate feature array based on layerType
-                updatedFeatures[layerType] = updatedFeatures[layerType].map(feat =>
-                    feat.id === layer._leaflet_id ? { ...feat, ...layer.toGeoJSON() } : feat
+                updatedFeatures[layer.type] = updatedFeatures[layer.type].map(feat => 
+                    feat._leaflet_id === layer._leaflet_id ? layer : feat
                 );
                 return updatedFeatures;
             });
         });
         setIsOpen(true);
+    };
+
+    const _onDeleted = (e) => {
+        const { layers } = e;
+        layers.eachLayer((layer) => {
+            console.log('layer', layer);
+            setFeatures(prevFeatures => {
+                let updatedFeatures = { ...prevFeatures };
+                // Remove the deleted feature from the appropriate feature array
+                updatedFeatures[layer.type] = updatedFeatures[layer.type].filter(feat => feat._leaflet_id !== layer._leaflet_id);
+                return updatedFeatures;
+            });
+        });
     };
 
     /************************************************************
@@ -141,8 +151,8 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                         onEdited={_onEdited}
                         onDrawStart={_onDrawStart}
                         onCreated={_onCreated}
-                        // onDeleted={_onDeleted}
-                        onEditStart={_onEditStart}
+                        onDeleted={_onDeleted}
+                        // onEditStart={_onEditStart}
                         // onEditStop={_onEditStop}
                         // onDeleteStart={_onDeleteStart}
                         // onDeleteStop={_onDeleteStop}

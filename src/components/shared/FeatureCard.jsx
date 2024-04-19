@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge"
 const FeatureCard = ({ feature }) => {
     const [copied, setCopied] = React.useState(false)
 
+    let geojsonFeature = feature.toGeoJSON();
+    console.log(geojsonFeature);
     let lat;
     let lng;
 
