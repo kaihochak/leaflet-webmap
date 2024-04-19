@@ -95,10 +95,6 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         });
     };
 
-    const _onEditStart = (e) => {
-        console.log('_onEditStart', e);
-    };
-
     const _onEdited = (e) => {
         const { layers } = e;
         let layerType = Object.values(layers._layers)[0].type;      // has to be a better way to get the layerType
@@ -113,6 +109,18 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
             });
         });
         setIsOpen(true);
+    };
+
+    const _onDeleted = (e) => {
+        const { layers } = e;
+        layers.eachLayer((layer) => {
+            setFeatures(prevFeatures => {
+                let updatedFeatures = { ...prevFeatures };
+                // Remove the deleted feature from the appropriate feature array
+                updatedFeatures[layer.type] = updatedFeatures[layer.type].filter(feat => feat._leaflet_id !== layer._leaflet_id);
+                return updatedFeatures;
+            });
+        });
     };
 
     /************************************************************
@@ -141,8 +149,8 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                         onEdited={_onEdited}
                         onDrawStart={_onDrawStart}
                         onCreated={_onCreated}
-                        // onDeleted={_onDeleted}
-                        onEditStart={_onEditStart}
+                        onDeleted={_onDeleted}
+                        // onEditStart={_onEditStart}
                         // onEditStop={_onEditStop}
                         // onDeleteStart={_onDeleteStart}
                         // onDeleteStop={_onDeleteStop}
