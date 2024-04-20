@@ -13,12 +13,9 @@ import { ChevronDown } from "lucide-react"
 
 const FeatureCard = ({ feature }) => {
     const [copied, setCopied] = React.useState(false)
-
     let geojsonFeature = feature.toGeoJSON();
     let type = geojsonFeature.geometry.type;
     let text = geojsonFeature.properties.text;
-    console.log(geojsonFeature);
-
 
     // copied should only be true for 2 seconds
     useEffect(() => {
@@ -29,17 +26,9 @@ const FeatureCard = ({ feature }) => {
         }
     }, [copied])
 
-
     const CopyButton = () => {
-
-        const handleCopy = (event) => {
-            event.preventDefault();
-            event.stopPropagation();    // stop the click event from bubbling up to parent elements
-            setCopied(!copied);
-        };
-
         return (
-            <Button onClick={handleCopy} variant="outline" size="icon" className={`${copied === true ? "bg-accent text-white" : ""}`}>
+            <Button onClick={() => setCopied(!copied)} variant="outline" size="icon" className={`${copied === true ? "bg-accent text-white" : ""}`}>
                 <IoCopyOutline className={`h-[1.2rem] w-[1.2rem]  transition-all ${copied === true ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`} />
                 <IoMdCheckmark className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${copied === true ? "rotate-0 scale-100" : "rotate-90 scale-0"}`} />
             </Button>

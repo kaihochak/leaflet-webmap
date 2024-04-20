@@ -30,26 +30,8 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     const [layerType, setLayerType] = React.useState('');               // type of feature
 
     /************************************************************
-     * Function to check input
-     ************************************************************/
-
-    // useEffect(() => {
-    //     console.log('layerType', layerType);
-    // }, [layerType]);
-
-    // useEffect(() => {
-    //     console.log('selectedLayer', selectedLayer);
-    // }, [selectedLayer]);
-
-    useEffect(() => {
-        console.log('features', features);
-        console.log(features.map(feat => feat.toGeoJSON()));
-    }, [features]);
-
-    /************************************************************
      * Function to add text to a feature
      ************************************************************/
-
     const form = useForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -66,7 +48,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                 // add or update the text property
                 if (feat._leaflet_id === selectedLayer._leaflet_id) {
                     if (!feat.feature) feat.feature = { type: 'Feature', properties: { text: data.text } };
-                    else feat.feature.properties.text = data.text;                         
+                    else feat.feature.properties.text = data.text;
                 }
                 return feat;
             });
@@ -89,21 +71,14 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         setSelectedLayer(layer);            // Store the selected layer
         setIsOpen(true);
         setFeatures(prevFeatures => [...prevFeatures, layer]);
-
     };
 
     const _onEdited = (e) => {
         const { layers } = e;
-        console.log('_onEdited', e);
-        e.layers.eachLayer((layer) => {
-            setFeatures(prevFeatures => {
-                let updatedFeatures = { ...prevFeatures };
-                // Update the appropriate feature array based on layerType
-                updatedFeatures[layer.type] = updatedFeatures[layer.type].map(feat =>
-                    feat._leaflet_id === layer._leaflet_id ? layer : feat
-                );
-                return updatedFeatures;
-            });
+        layers.eachLayer((layer) => {
+            setFeatures(prevFeatures => prevFeatures.map(feat => 
+                feat._leaflet_id === layer._leaflet_id ? layer : feat
+            ));
         });
         setIsOpen(true);
     };
@@ -111,13 +86,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     const _onDeleted = (e) => {
         const { layers } = e;
         layers.eachLayer((layer) => {
-            console.log('layer', layer);
-            setFeatures(prevFeatures => {
-                let updatedFeatures = { ...prevFeatures };
-                // Remove the deleted feature from the appropriate feature array
-                updatedFeatures[layer.type] = updatedFeatures[layer.type].filter(feat => feat._leaflet_id !== layer._leaflet_id);
-                return updatedFeatures;
-            });
+            setFeatures(prevFeatures => prevFeatures.filter(feat => feat._leaflet_id !== layer._leaflet_id));
         });
     };
 
@@ -148,10 +117,6 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                         onDrawStart={_onDrawStart}
                         onCreated={_onCreated}
                         onDeleted={_onDeleted}
-                        // onEditStart={_onEditStart}
-                        // onEditStop={_onEditStop}
-                        // onDeleteStart={_onDeleteStart}
-                        // onDeleteStop={_onDeleteStop}
                         draw={{
                             rectangle: false,
                             circle: false,
