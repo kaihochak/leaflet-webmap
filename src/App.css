@@ -36,7 +36,7 @@
     --accent: 195 40% 50%; /* Blue */
     --accent-light: 210 40% 98%; /* Light Blue */
     --accent-dark: 210 40% 94%; /* Dark Blue */
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
