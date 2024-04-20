@@ -25,7 +25,7 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
     const [searchTerm, setSearchTerm] = React.useState('');
     const [allFeatures, setAllFeatures] = React.useState([]);
     const [searchResults, setSearchResults] = React.useState([]);
-           
+
     // convert parentFeatures to features by flatening the object
     useEffect(() => {
         const flatFeatures = Object.values(parentFeatures).flat();
@@ -45,7 +45,11 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
         // Otherwise, filter features based on search term
         else {
             const filtered = allFeatures.filter(feature =>
-                feature.text.toLowerCase().includes(searchTerm.toLowerCase())
+                { 
+                    let geojsonFeature = feature.toGeoJSON();
+                    if (!geojsonFeature.properties.text) return false;
+                    else return feature.toGeoJSON().properties.text.toLowerCase().includes(searchTerm.toLowerCase());
+                }
             );
             setSearchResults(filtered);
         }
