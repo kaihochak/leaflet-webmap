@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Textarea } from "@/components/ui/textarea"
 import { IoCopyOutline } from "react-icons/io5";
 import { IoMdCheckmark } from "react-icons/io";
+import { RxCross2, RxCheck } from "react-icons/rx";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -28,8 +29,14 @@ const FeatureCard = ({ feature, setEditDetails }) => {
     let geojsonFeature = feature.toGeoJSON();
     let type = geojsonFeature.geometry.type;
     let text = geojsonFeature.properties.text;
+    let textElement = text?.split('<br>').map((line, index) =>
+        <p key={index}>{line || <br />}</p>
+    );
+    let textNewLineString = text?.replace(/<br>/g, '\n');
 
-    // copied should only be true for 2 seconds
+    /************************************************************
+     * Function for copy
+     ************************************************************/
     useEffect(() => {
         if (copied) {
             setTimeout(() => {
@@ -38,9 +45,15 @@ const FeatureCard = ({ feature, setEditDetails }) => {
         }
     }, [copied])
 
+    const handleCopy = () => {
+
+        navigator.clipboard.writeText(JSON.stringify(geojsonFeature));
+        setCopied(true);
+    }
+
     const CopyButton = () => {
         return (
-            <Button onClick={() => setCopied(!copied)} variant="outline" size="icon" className={`${copied === true ? "bg-accent text-white" : ""}`}>
+            <Button onClick={handleCopy} variant="outline" size="icon" className={`${copied === true ? "bg-accent text-white" : ""}`}>
                 <IoCopyOutline className={`h-[1.2rem] w-[1.2rem]  transition-all ${copied === true ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`} />
                 <IoMdCheckmark className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${copied === true ? "rotate-0 scale-100" : "rotate-90 scale-0"}`} />
             </Button>
@@ -106,13 +119,13 @@ const FeatureCard = ({ feature, setEditDetails }) => {
      ************************************************************/
     const form = useForm({
         resolver: zodResolver(FormSchema),
-        // either use the feature text or an empty string
         defaultValues: {
-            text: text,
+            text: textNewLineString || "",
         },
     })
 
     const onSubmitText = (data) => {
+        setEditing(!editing);
         setEditDetails({ id: feature._leaflet_id, newText: data.text });
         form.reset();
     }
@@ -134,35 +147,49 @@ const FeatureCard = ({ feature, setEditDetails }) => {
                     </CardDescription>
                     {/* Feature text */}
                     <CardTitle >
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmitText)} >
-                                <div className="flex items-start justify-between gap-x-4">
-                                    {!editing && text ?
-                                        <Label htmlFor="text" className="py-1">
-                                            {text.split('<br>').map((line, index) =>
-                                                <p key={index}>{line || <br />}</p>
-                                            )}
-                                        </Label> :
-                                        <FormField
-                                            control={form.control}
-                                            name="text"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormControl>
-                                                        <Textarea className="min-h-[30px] w-full" placeholder="Add text" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    }
-                                    <Button onClick={() => setEditing(!editing)} variant="outline" size="icon" className={`${copied === true ? "bg-accent text-white" : ""}`}>
-                                        <FaRegEdit className={`h-[1.2rem] w-[1.2rem]  transition-all ${editing === true ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`} />
-                                        <MdOutlineKeyboardArrowRight className={`absolute h-[1.7rem] w-[1.7rem] transition-all ${editing === true ? "rotate-0 scale-100" : "rotate-90 scale-0"}`} />
-                                    </Button>
-                                </div>
-                            </form>
-                        </Form>
+                        {editing ?
+                            // Edit text form 
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmitText)}  >
+                                    <div className="flex items-start justify-between gap-x-4">
+                                        <div className='w-full'>
+                                            <FormField
+                                                control={form.control}
+                                                name="text"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <Textarea className="min-h-[30px] w-full" placeholder="Add text" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className='flex-between gap-x-2'>
+                                            <Button onClick={() => setEditing(false)} variant="outline" size="icon">
+                                                <RxCross2 className="h-[1.2rem] w-[1.2rem]" />
+                                            </Button>
+                                            <Button type="submit" variant="outline" size="icon">
+                                                <RxCheck className="h-[1.4rem] w-[1.4rem]" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </Form>
+                            :
+
+                            // Display text
+                            <div className="flex-between gap-x-4">
+                                <Label htmlFor="text" className="py-1">
+                                    {!text && <p className="text-gray-400">No text</p>}
+                                    {text && textElement}
+                                </Label>
+                                <Button onClick={() => setEditing(!editing)} variant="outline" size="icon">
+                                    <FaRegEdit className={`h-[1.2rem] w-[1.2rem]  transition-all ${editing === true ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`} />
+                                </Button>
+                            </div>
+                        }
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

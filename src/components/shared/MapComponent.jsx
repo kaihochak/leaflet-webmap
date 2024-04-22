@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Polyline, Polygon, Popup, FeatureGroup } from 'react-leaflet';
 // import EditControl from '@/lib/EditControl';
 import { EditControl } from "react-leaflet-draw"
-import { DEFAULT_POSITION, MARKERS, CUSTOM_ICON } from '@/config/mapConfig';
+import { DEFAULT_POSITION } from '@/config/mapConfig';
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
