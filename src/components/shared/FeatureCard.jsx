@@ -1,18 +1,30 @@
 import React, { useEffect } from 'react'
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { IoCopyOutline } from "react-icons/io5";
 import { IoMdCheckmark } from "react-icons/io";
+import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/coordAccordion"
 import { ChevronDown } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
+// Schema for the text input form
+const FormSchema = z.object({
+    text: z.string().min(1, {
+        message: "text must be at least 1 character.",
+    }),
+})
 
-const FeatureCard = ({ feature }) => {
+const FeatureCard = ({ feature, setEditDetails }) => {
     const [copied, setCopied] = React.useState(false)
+    const [editing, setEditing] = React.useState(false)
     let geojsonFeature = feature.toGeoJSON();
     let type = geojsonFeature.geometry.type;
     let text = geojsonFeature.properties.text;
@@ -89,6 +101,22 @@ const FeatureCard = ({ feature }) => {
         )
     }
 
+    /************************************************************
+     * Function for text
+     ************************************************************/
+    const form = useForm({
+        resolver: zodResolver(FormSchema),
+        // either use the feature text or an empty string
+        defaultValues: {
+            text: text,
+        },
+    })
+
+    const onSubmitText = (data) => {
+        setEditDetails({ id: feature._leaflet_id, newText: data.text });
+        form.reset();
+    }
+
     /*********************************************************************************************
      * Rendering
      *******************************************************************************************/
@@ -98,7 +126,7 @@ const FeatureCard = ({ feature }) => {
             <Card className="w-[350px]">
                 <CardHeader>
                     {/* Feature # & Feauter type */}
-                    <CardDescription className="pb-4 flex-between gap-x-8">
+                    <CardDescription className="pb-2 flex-between gap-x-8">
                         <>Feature #{feature._leaflet_id}</>
                         {type === "Point" && <Badge className="bg-secondary">Point</Badge>}
                         {type === "LineString" && <Badge className="bg-accent">Line</Badge>}
@@ -106,15 +134,35 @@ const FeatureCard = ({ feature }) => {
                     </CardDescription>
                     {/* Feature text */}
                     <CardTitle >
-                        <div className="grid items-center w-full gap-4">
-                            {text ?
-                                <Label htmlFor="text" className="py-3">{text}</Label> :
-                                <div className="relative flex-between space-y-1.5">
-                                    <Input id="text" placeholder="Add a text" className="pr-8" />
-                                    <Button asChild className="absolute right-0 w-5 h-5 m-2 bottom-2.5" variant="ghost" size="icon"><MdOutlineKeyboardArrowRight /></Button>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmitText)} >
+                                <div className="flex items-start justify-between gap-x-4">
+                                    {!editing && text ?
+                                        <Label htmlFor="text" className="py-1">
+                                            {text.split('<br>').map((line, index) =>
+                                                <p key={index}>{line || <br />}</p>
+                                            )}
+                                        </Label> :
+                                        <FormField
+                                            control={form.control}
+                                            name="text"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Textarea className="min-h-[30px] w-full" placeholder="Add text" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    }
+                                    <Button onClick={() => setEditing(!editing)} variant="outline" size="icon" className={`${copied === true ? "bg-accent text-white" : ""}`}>
+                                        <FaRegEdit className={`h-[1.2rem] w-[1.2rem]  transition-all ${editing === true ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`} />
+                                        <MdOutlineKeyboardArrowRight className={`absolute h-[1.7rem] w-[1.7rem] transition-all ${editing === true ? "rotate-0 scale-100" : "rotate-90 scale-0"}`} />
+                                    </Button>
                                 </div>
-                            }
-                        </div>
+                            </form>
+                        </Form>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

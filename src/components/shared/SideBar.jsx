@@ -2,13 +2,12 @@ import React from 'react'
 import { BiMenuAltRight } from "react-icons/bi";
 import SearchSidebar from '@/components/shared/SearchSidebar'
 
-const SideBar = ({ features }) => {
+const SideBar = ({ features, setEditDetails }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(true)
 
   /************************************************************
    * Rendering
    ************************************************************/
-
   return (
     <section>
       {/* close side bar */}
@@ -20,7 +19,12 @@ const SideBar = ({ features }) => {
 
       {/* open side bar */}
       <div id="sidebar-open" className={`${sidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
-        <SearchSidebar features={features} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+        <SearchSidebar 
+          features={features} 
+          setEditDetails={setEditDetails}
+          sidebarOpen={sidebarOpen} 
+          setSidebarOpen={setSidebarOpen}
+        />
       </div>
     </section>
   )

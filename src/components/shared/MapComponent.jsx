@@ -5,11 +5,11 @@ import { EditControl } from "react-leaflet-draw"
 import { DEFAULT_POSITION, MARKERS, CUSTOM_ICON } from '@/config/mapConfig';
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { set, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 // Schema for the text input form
@@ -23,11 +23,10 @@ const FormSchema = z.object({
  * Main Map Component
  ************************************************************/
 
-const MapComponent = ({ textMode, features, setFeatures }) => {
+const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
-    const [layerType, setLayerType] = React.useState('');               // type of feature
 
     /************************************************************
      * Function to add text to a feature
@@ -39,16 +38,22 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
         },
     })
 
-    // bind the text to the selected feature, 
-    // then push it to the properties field so we could use toGeoJSON() to get the feature
+    // bind the text to the selected feature, then push it to the properties field so we could use toGeoJSON() to get the feature
     const onSubmitText = (data) => {
-        selectedLayer.bindPopup(data.text).openPopup();         // get the newly created feature, add the text and update the state
+
+        let popupContent = '';                                  // extract lines
+        let lastLine = data.text.split('\n').pop();             // add line breaks if not the last line
+        for (let line of data.text.split('\n')) {
+            popupContent += `${line}` + (line !== lastLine ? '<br>' : '');
+        }
+
+        selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
         setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
             let updatedFeatures = prevFeatures.map(feat => {
                 // add or update the text property
                 if (feat._leaflet_id === selectedLayer._leaflet_id) {
-                    if (!feat.feature) feat.feature = { type: 'Feature', properties: { text: data.text } };
-                    else feat.feature.properties.text = data.text;
+                    if (!feat.feature) feat.feature = { type: 'Feature', properties: { text: popupContent } };
+                    else feat.feature.properties.text = popupContent;
                 }
                 return feat;
             });
@@ -58,13 +63,38 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     }
 
     /************************************************************
-     * Functions to handle react-leaflet-draw events
+     * Function to edit text without triggering leaflet-draw
      ************************************************************/
 
-    const _onDrawStart = (e) => {
-        setLayerType(e.layerType);
-    };
+    useEffect(() => {
+        onEdit(editDetails);
+    }, [editDetails]);
 
+    const onEdit = (editDetails) => {
+        const { id, newText } = editDetails;
+
+        setFeatures(prevFeatures => {
+            let updatedFeatures = prevFeatures.map(feat => {
+                if (feat._leaflet_id === id) {
+                    if (!feat.feature) feat.feature = { type: 'Feature', properties: { text: newText } };
+                    else feat.feature.properties.text = newText;
+                }
+                return feat;
+            });
+            return updatedFeatures;
+        });
+
+        // Find the edited feature and save it for onSubmitText() to use
+        let newTextLayer = features.find(feat => feat._leaflet_id === id);
+        if (newTextLayer) {
+            setSelectedLayer(newTextLayer);
+            onSubmitText({ text: newText });
+        }
+    }
+    
+    /************************************************************
+     * Functions to handle react-leaflet-draw events
+     ************************************************************/
     const _onCreated = (e) => {
         console.log('_onCreated', e);
         const { layer } = e;
@@ -76,7 +106,7 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
     const _onEdited = (e) => {
         const { layers } = e;
         layers.eachLayer((layer) => {
-            setFeatures(prevFeatures => prevFeatures.map(feat => 
+            setFeatures(prevFeatures => prevFeatures.map(feat =>
                 feat._leaflet_id === layer._leaflet_id ? layer : feat
             ));
         });
@@ -114,7 +144,6 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                         textMode={textMode}
                         position="bottomleft"
                         onEdited={_onEdited}
-                        onDrawStart={_onDrawStart}
                         onCreated={_onCreated}
                         onDeleted={_onDeleted}
                         draw={{
@@ -135,16 +164,14 @@ const MapComponent = ({ textMode, features, setFeatures }) => {
                     <DialogContent className="sm:max-w-[425px]">
                         <Form {...form} >
                             <form onSubmit={form.handleSubmit(onSubmitText)} className="flex flex-col w-full gap-y-4">
-
                                 <Label htmlFor="name">Description</Label>
-
                                 <FormField
                                     control={form.control}
                                     name="text"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <Input placeholder="Add your text" {...field} />
+                                                <Textarea placeholder="Add text" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

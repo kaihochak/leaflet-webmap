@@ -21,7 +21,7 @@ import FeatureCard from '@/components/shared/FeatureCard'
  * 
  *********************************************************************************/
 
-const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }) => {
+const SearchSidebar = ({ features: parentFeatures, setEditDetails, sidebarOpen, setSidebarOpen }) => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [allFeatures, setAllFeatures] = React.useState([]);
     const [searchResults, setSearchResults] = React.useState([]);
@@ -44,12 +44,11 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
         if (!searchTerm.trim()) setSearchResults(allFeatures);
         // Otherwise, filter features based on search term
         else {
-            const filtered = allFeatures.filter(feature =>
-                { 
-                    let geojsonFeature = feature.toGeoJSON();
-                    if (!geojsonFeature.properties.text) return false;
-                    else return feature.toGeoJSON().properties.text.toLowerCase().includes(searchTerm.toLowerCase());
-                }
+            const filtered = allFeatures.filter(feature => {
+                let geojsonFeature = feature.toGeoJSON();
+                if (!geojsonFeature.properties.text) return false;
+                else return feature.toGeoJSON().properties.text.toLowerCase().includes(searchTerm.toLowerCase());
+            }
             );
             setSearchResults(filtered);
         }
@@ -74,7 +73,9 @@ const SearchSidebar = ({ features: parentFeatures, sidebarOpen, setSidebarOpen }
             <div className='flex-col gap-y-4'>
                 {searchResults.length === 0 ?
                     <p>No features found</p> :
-                    searchResults.map((feature, index) => <FeatureCard key={index} feature={feature} />)
+                    searchResults.map((feature, index) =>
+                        <FeatureCard key={index} feature={feature} setEditDetails={setEditDetails}/>
+                    )
                 }
             </div>
         );
