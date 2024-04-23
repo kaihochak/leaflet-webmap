@@ -26,7 +26,7 @@ const FormSchema = z.object({
 const FeatureCard = ({ feature, setEditDetails }) => {
     const [copied, setCopied] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
-    const { geojsonFeature, type, textElement, textNewLineString } = getGeojsonFeature(feature);
+    const { geojsonFeature, type, text, textElement, textNewLineString } = getGeojsonFeature(feature);
 
     /************************************************************
      * Function for copy
@@ -40,7 +40,6 @@ const FeatureCard = ({ feature, setEditDetails }) => {
     }, [copied])
 
     const handleCopy = () => {
-
         navigator.clipboard.writeText(JSON.stringify(geojsonFeature));
         setCopied(true);
     }

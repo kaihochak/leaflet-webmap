@@ -12,13 +12,14 @@ import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import TextInput from '@/components/shared/TextInput'
 
 // Schema for the text input form
-const FormSchema = z.object({
-    text: z.string().min(1, {
-        message: "text must be at least 1 character.",
-    }),
-})
+// const FormSchema = z.object({
+//     text: z.string().min(1, {
+//         message: "text must be at least 1 character.",
+//     }),
+// })
 
 /************************************************************
  * Main Map Component
@@ -28,18 +29,18 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
-
+    const [textInput, setTextInput] = React.useState('');               // text input
     L.Icon.Default.imagePath = '/images/';
 
     /************************************************************
      * Function to add text to a feature
      ************************************************************/
-    const form = useForm({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            text: "",
-        },
-    })
+    // const form = useForm({
+    //     resolver: zodResolver(FormSchema),
+    //     defaultValues: {
+    //         text: textInput || "",
+    //     },
+    // })
 
     // bind the text to the selected feature, then push it to the properties field so we could use toGeoJSON() to get the feature
     const onSubmitText = (data) => {
@@ -60,6 +61,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
             });
             return updatedFeatures;
         });
+        setSelectedLayer({});                                   // clear the selected layer
         setIsOpen(false);
     }
 
@@ -106,7 +108,6 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
      * Functions to handle react-leaflet-draw events
      ************************************************************/
     const _onCreated = (e) => {
-        console.log('_onCreated', e);
         const { layer } = e;
         setSelectedLayer(layer);            // Store the selected layer
         setIsOpen(true);
@@ -115,8 +116,10 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     const _onEdited = (e) => {
         const { layers } = e;
+
         layers.eachLayer((layer) => {
-            setSelectedLayer(layer);            // Store the selected layer
+            setSelectedLayer(layer); // Store the selected layer
+            setTextInput(layer.feature.properties.text); // Store the text input for text prompt
             setFeatures(prevFeatures => prevFeatures.map(feat =>
                 feat._leaflet_id === layer._leaflet_id ? layer : feat
             ));
@@ -169,8 +172,16 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
                 </FeatureGroup>
             </MapContainer>
 
+            <TextInput 
+                textMode={textMode} 
+                textInput={textInput} 
+                onSubmitText={onSubmitText}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+            />
+
             {/* Text Input Modal */}
-            {textMode &&
+            {/* {textMode &&
                 <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
                     <DialogContent className="sm:max-w-[425px]">
                         <Form {...form} >
@@ -195,7 +206,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
                         </Form>
                     </DialogContent>
                 </Dialog>
-            }
+            } */}
         </section>
     );
 }
