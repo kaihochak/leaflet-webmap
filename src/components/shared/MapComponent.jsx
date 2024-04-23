@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 // import EditControl from '@/lib/EditControl';
 import { EditControl } from "react-leaflet-draw"
+import 'leaflet/dist/leaflet.css';
 import { DEFAULT_POSITION } from '@/config/mapConfig';
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
@@ -11,15 +12,6 @@ import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import L from 'leaflet';
-
-// Fix the broken image paths for the default marker icons
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
-    iconUrl: require('leaflet/dist/images/marker-icon.png').default,
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default
-});
 
 // Schema for the text input form
 const FormSchema = z.object({
@@ -36,6 +28,9 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
+
+
+    L.Icon.Default.imagePath = '../../node_modules/leaflet/dist/images/';
 
     /************************************************************
      * Function to add text to a feature
