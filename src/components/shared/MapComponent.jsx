@@ -43,13 +43,9 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     // bind the text to the selected feature, then push it to the properties field so we could use toGeoJSON() to get the feature
     const onSubmitText = (data) => {
+        let popupContent = getPopupContent(data.text);
 
-        let popupContent = '';                                  // extract lines
-        let lastLine = data.text.split('\n').pop();             // add line breaks if not the last line
-        for (let line of data.text.split('\n')) {
-            popupContent += `${line}` + (line !== lastLine ? '<br>' : '');
-        }
-
+        if (!selectedLayer) return;
         selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
         setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
             let updatedFeatures = prevFeatures.map(feat => {
@@ -65,6 +61,16 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
         setIsOpen(false);
     }
 
+    const getPopupContent = (text) => { 
+        if (!text) return '';
+        let popupContent = '';                                  // extract lines
+        let lastLine = text.split('\n').pop();                  // add line breaks if not the last line
+        for (let line of text.split('\n')) {
+            popupContent += `${line}` + (line !== lastLine ? '<br>' : '');
+        }
+        return popupContent;
+    }
+
     /************************************************************
      * Function to edit text without triggering leaflet-draw
      ************************************************************/
@@ -75,24 +81,36 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     const onEdit = (editDetails) => {
         const { id, newText } = editDetails;
+        let popupContent = getPopupContent(newText);
 
         setFeatures(prevFeatures => {
             let updatedFeatures = prevFeatures.map(feat => {
                 if (feat._leaflet_id === id) {
-                    if (!feat.feature) feat.feature = { type: 'Feature', properties: { text: newText } };
+                    if (!feat.feature) {
+                        feat.feature = { type: 'Feature', properties: { text: newText } };
+                    }
                     else feat.feature.properties.text = newText;
+                    // update the popup
+                    feat.bindPopup(popupContent).openPopup();
                 }
                 return feat;
             });
             return updatedFeatures;
         });
 
+
+        // if (!selectedLayer) return;
+        // selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
+        setIsOpen(false);
+
+
         // Find the edited feature and save it for onSubmitText() to use
-        let newTextLayer = features.find(feat => feat._leaflet_id === id);
-        if (newTextLayer) {
-            setSelectedLayer(newTextLayer);
-            onSubmitText({ text: newText });
-        }
+        // let newTextLayer = features.find(feat => feat._leaflet_id === id);
+        // if (newTextLayer) {
+        //     console.log('selectedLayer', selectedLayer);
+        //     setSelectedLayer({...newTextLayer});
+        //     onSubmitText({ text: newText });
+        // }
     }
 
     /************************************************************
