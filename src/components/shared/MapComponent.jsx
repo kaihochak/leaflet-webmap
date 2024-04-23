@@ -11,10 +11,15 @@ import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import 'leaflet/dist/leaflet.css';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import L from 'leaflet';
 
+// Fix the broken image paths for the default marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+    iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default
+});
 
 // Schema for the text input form
 const FormSchema = z.object({
@@ -28,14 +33,6 @@ const FormSchema = z.object({
  ************************************************************/
 
 const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
-
-    // fix for leaflet icons not showing when deployed
-    let DefaultIcon = L.icon({
-        iconUrl: icon,
-        shadowUrl: iconShadow
-    });
-    L.Marker.prototype.options.icon = DefaultIcon;
-
 
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
