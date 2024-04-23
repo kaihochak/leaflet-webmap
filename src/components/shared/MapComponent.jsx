@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Polyline, Polygon, Popup, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 // import EditControl from '@/lib/EditControl';
 import { EditControl } from "react-leaflet-draw"
 import { DEFAULT_POSITION } from '@/config/mapConfig';
@@ -11,6 +11,17 @@ import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+
+// fix for leaflet icons not showing when deployed
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 // Schema for the text input form
 const FormSchema = z.object({
