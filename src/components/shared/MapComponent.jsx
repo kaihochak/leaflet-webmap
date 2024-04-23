@@ -16,13 +16,6 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 
-// fix for leaflet icons not showing when deployed
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-
 // Schema for the text input form
 const FormSchema = z.object({
     text: z.string().min(1, {
@@ -35,6 +28,14 @@ const FormSchema = z.object({
  ************************************************************/
 
 const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
+
+    // fix for leaflet icons not showing when deployed
+    let DefaultIcon = L.icon({
+        iconUrl: icon,
+        shadowUrl: iconShadow
+    });
+    L.Marker.prototype.options.icon = DefaultIcon;
+
 
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
@@ -102,7 +103,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
             onSubmitText({ text: newText });
         }
     }
-    
+
     /************************************************************
      * Functions to handle react-leaflet-draw events
      ************************************************************/
