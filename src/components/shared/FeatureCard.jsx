@@ -195,6 +195,39 @@ const FeatureCard = ({ feature, setEditDetails }) => {
                 <CardContent>
                     {/* Feature coordinates */}
                     <Coordinates />
+
+
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="item-1">
+                            <div className='flex-between'>
+                                <AccordionTrigger className='pt-6 flex-between gap-x-[140px]'>
+                                    <div>Linked Features (5)</div>
+                                    <ChevronDown className="w-4 h-4 transition-transform duration-200 shrink-0" />
+                                </AccordionTrigger>
+                            </div>
+                            <AccordionContent>
+                                <div className='grid w'>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="item-1">
+                            <div className='flex-between'>
+                                <AccordionTrigger className='pt-6 flex-between gap-x-[120px]'>
+                                    <div>Linked Text Blocks (2)</div>
+                                    <ChevronDown className="w-4 h-4 transition-transform duration-200 shrink-0" />
+                                </AccordionTrigger>
+                            </div>
+                            <AccordionContent>
+                                <div className='flex flex-col'>
+                                    <p>Important Place</p>
+                                    <p>Available</p>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </CardContent>
             </Card>
         </div>

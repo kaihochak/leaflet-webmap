@@ -8,6 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -180,6 +189,19 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
                                         </FormItem>
                                     )}
                                 />
+                                <Label htmlFor="name">Associated Features</Label>
+
+                                <Select>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Features" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="light">Line #10 (Route T20)</SelectItem>
+                                        <SelectItem value="dark">Area #2 (Site 50)</SelectItem>
+                                        <SelectItem value="system">Point #5 (Entrance Point A)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
                                 <DialogFooter>
                                     <Button type="submit" className="bg-primary-dark">Save</Button>
                                 </DialogFooter>
