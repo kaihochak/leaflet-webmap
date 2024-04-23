@@ -46,6 +46,8 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
         let popupContent = getPopupContent(data.text);
 
         if (!selectedLayer) return;
+
+        console.log('selectedLayer', selectedLayer);
         selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
         setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
             let updatedFeatures = prevFeatures.map(feat => {
@@ -97,20 +99,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
             });
             return updatedFeatures;
         });
-
-
-        // if (!selectedLayer) return;
-        // selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
         setIsOpen(false);
-
-
-        // Find the edited feature and save it for onSubmitText() to use
-        // let newTextLayer = features.find(feat => feat._leaflet_id === id);
-        // if (newTextLayer) {
-        //     console.log('selectedLayer', selectedLayer);
-        //     setSelectedLayer({...newTextLayer});
-        //     onSubmitText({ text: newText });
-        // }
     }
 
     /************************************************************
@@ -127,6 +116,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
     const _onEdited = (e) => {
         const { layers } = e;
         layers.eachLayer((layer) => {
+            setSelectedLayer(layer);            // Store the selected layer
             setFeatures(prevFeatures => prevFeatures.map(feat =>
                 feat._leaflet_id === layer._leaflet_id ? layer : feat
             ));
