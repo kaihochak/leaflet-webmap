@@ -4,7 +4,6 @@ import { IoCopyOutline } from "react-icons/io5";
 import { IoMdCheckmark } from "react-icons/io";
 import { RxCross2, RxCheck } from "react-icons/rx";
 import { FaRegEdit } from "react-icons/fa";
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
@@ -15,6 +14,7 @@ import { ChevronDown } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { getGeojsonFeature } from '@/utility';
 
 // Schema for the text input form
 const FormSchema = z.object({
@@ -26,13 +26,7 @@ const FormSchema = z.object({
 const FeatureCard = ({ feature, setEditDetails }) => {
     const [copied, setCopied] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
-    let geojsonFeature = feature.toGeoJSON();
-    let type = geojsonFeature.geometry.type;
-    let text = geojsonFeature.properties.text;
-    let textElement = text?.split('<br>').map((line, index) =>
-        <p key={index}>{line || <br />}</p>
-    );
-    let textNewLineString = text?.replace(/<br>/g, '\n');
+    const { geojsonFeature, type, textElement, textNewLineString } = getGeojsonFeature(feature);
 
     /************************************************************
      * Function for copy
