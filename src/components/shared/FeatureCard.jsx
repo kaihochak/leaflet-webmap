@@ -14,7 +14,6 @@ import { ChevronDown } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { getGeojsonFeature } from '@/utility';
 
 // Schema for the text input form
 const FormSchema = z.object({
@@ -23,10 +22,14 @@ const FormSchema = z.object({
     }),
 })
 
-const FeatureCard = ({ feature, setEditDetails }) => {
+const FeatureCard = ({ feature, setEditDetails, searchTerm }) => {
     const [copied, setCopied] = React.useState(false)
     const [editing, setEditing] = React.useState(false)
-    const { geojsonFeature, type, text, textElement, textNewLineString } = getGeojsonFeature(feature);
+
+    let geojsonFeature = feature.toGeoJSON();
+    let type = geojsonFeature.geometry.type;
+    let text = geojsonFeature.properties.text;
+    let textNewLineString = text?.replace(/<br>/g, '\n');
 
     /************************************************************
      * Function for copy
@@ -123,6 +126,25 @@ const FeatureCard = ({ feature, setEditDetails }) => {
         form.reset();
     }
 
+    // highlight text AND split text by line
+    function highlightText(text, searchTerm) {
+        return text.split('<br>').map((line, index) => {
+            const parts = line.split(new RegExp(`(${searchTerm})`, 'gi'));
+            return (
+                <p key={index}>
+                    {parts.map((part, i) =>
+                        part.toLowerCase() === searchTerm.toLowerCase() ? (
+                            <span key={i} style={{ backgroundColor: 'yellow' }}>{part}</span>
+                        ) : (
+                            part
+                        )
+                    )}
+                    {!line && <br />}
+                </p>
+            );
+        });
+    }
+
     /*********************************************************************************************
      * Rendering
      *******************************************************************************************/
@@ -171,12 +193,13 @@ const FeatureCard = ({ feature, setEditDetails }) => {
                                 </form>
                             </Form>
                             :
-
                             // Display text
                             <div className="flex-between gap-x-4">
                                 <Label htmlFor="text" className="py-1">
                                     {!text && <p className="text-gray-400">No text</p>}
-                                    {text && textElement}
+                                    {text && (
+                                        <p>{highlightText(text, searchTerm)}</p>
+                                    )}
                                 </Label>
                                 <Button onClick={() => setEditing(!editing)} variant="outline" size="icon">
                                     <FaRegEdit className={`h-[1.2rem] w-[1.2rem]  transition-all ${editing === true ? "-rotate-90 scale-0" : "rotate-0 scale-100"}`} />

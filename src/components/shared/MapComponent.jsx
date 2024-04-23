@@ -4,22 +4,7 @@ import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw"
 import 'leaflet/dist/leaflet.css';
 import { DEFAULT_POSITION } from '@/config/mapConfig';
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
-import { Label } from "@/components/ui/label"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
 import TextInput from '@/components/shared/TextInput'
-
-// Schema for the text input form
-// const FormSchema = z.object({
-//     text: z.string().min(1, {
-//         message: "text must be at least 1 character.",
-//     }),
-// })
 
 /************************************************************
  * Main Map Component
@@ -32,23 +17,12 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
     const [textInput, setTextInput] = React.useState('');               // text input
     L.Icon.Default.imagePath = '/images/';
 
-    /************************************************************
-     * Function to add text to a feature
-     ************************************************************/
-    // const form = useForm({
-    //     resolver: zodResolver(FormSchema),
-    //     defaultValues: {
-    //         text: textInput || "",
-    //     },
-    // })
-
     // bind the text to the selected feature, then push it to the properties field so we could use toGeoJSON() to get the feature
     const onSubmitText = (data) => {
         let popupContent = getPopupContent(data.text);
 
         if (!selectedLayer) return;
 
-        console.log('selectedLayer', selectedLayer);
         selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
         setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
             let updatedFeatures = prevFeatures.map(feat => {
@@ -61,6 +35,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
             });
             return updatedFeatures;
         });
+        setTextInput('');                                       // clear the text input
         setSelectedLayer({});                                   // clear the selected layer
         setIsOpen(false);
     }

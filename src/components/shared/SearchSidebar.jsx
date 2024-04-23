@@ -4,23 +4,6 @@ import { IoCloseSharp } from "react-icons/io5";
 import debounce from "lodash.debounce";
 import FeatureCard from '@/components/shared/FeatureCard'
 
-
-/********************************************************************************
- * 
- * The shape of the features object is as follows:
- * 
- * {
- *     marker: [marker1, marker2, ...],
- *     polyline: [polyline1, polyline2, ...],
- *     polygon: [polygon1, polygon2, ...]
- * }
- * 
- * After flattening the object, the features array will look like this:
- * 
- *      [marker1, marker2, polyline1, polyline2, polygon1, polygon2, ...]
- * 
- *********************************************************************************/
-
 const SearchSidebar = ({ features: parentFeatures, setEditDetails, sidebarOpen, setSidebarOpen }) => {
     const [searchTerm, setSearchTerm] = React.useState('');
     const [allFeatures, setAllFeatures] = React.useState([]);
@@ -74,7 +57,7 @@ const SearchSidebar = ({ features: parentFeatures, setEditDetails, sidebarOpen, 
                 {searchResults.length === 0 ?
                     <p>No features found</p> :
                     searchResults.map((feature, index) =>
-                        <FeatureCard key={index} feature={feature} setEditDetails={setEditDetails}/>
+                        <FeatureCard key={index} feature={feature} setEditDetails={setEditDetails} searchTerm={searchTerm}/>
                     )
                 }
             </div>
