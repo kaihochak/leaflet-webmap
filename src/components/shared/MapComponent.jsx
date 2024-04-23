@@ -29,7 +29,7 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
 
-    L.Icon.Default.imagePath = 'public/images/';
+    L.Icon.Default.imagePath = '/images/';
 
     /************************************************************
      * Function to add text to a feature
