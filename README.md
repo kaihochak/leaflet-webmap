@@ -2,7 +2,7 @@
 
 This is a dynamic web mapping application developed using React, Vite, and React-Leaflet, styled with Tailwind CSS and Shadcn. It allows users to create, edit, and manage geographical features such as points, lines, and areas, and integrates functionalities for enhanced data interaction and documentation.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/mM_NDzcjylU?si=tQitNjtt0FYjbhYe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Watch the video](/path/to/your/thumbnail.jpg)](https://www.youtube.com/watch?v=mM_NDzcjylU)
 
 
 ## Features
