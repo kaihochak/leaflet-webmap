@@ -27,7 +27,7 @@ const TextInput = ({textMode, textInput, onSubmitText, isOpen, setIsOpen}) => {
 
     // make sure the text input is exactly the text of the feature we are editing
     useEffect(() => {
-        form.setValue('text', textInput)
+        form.setValue('text', textInput?.replace(/<br>/g, '\n'))
     }, [textInput])
 
     return (
