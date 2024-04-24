@@ -14,7 +14,6 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
     const [isOpen, setIsOpen] = React.useState(false);                  // text input modal
     const [selectedLayer, setSelectedLayer] = React.useState({});       // selected feature
-    const [textInput, setTextInput] = React.useState('');               // text input
     L.Icon.Default.imagePath = '/images/';
 
     // bind the text to the selected feature, then push it to the properties field so we could use toGeoJSON() to get the feature
@@ -22,7 +21,6 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
         let popupContent = getPopupContent(data.text);
 
         if (!selectedLayer) return;
-
         selectedLayer.bindPopup(popupContent).openPopup();      // get the selected feature, add the text and update the state
         setFeatures(prevFeatures => {                           // find the feature that has the same _leaflet_id as the selectedLayer
             let updatedFeatures = prevFeatures.map(feat => {
@@ -35,7 +33,6 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
             });
             return updatedFeatures;
         });
-        setTextInput('');                                       // clear the text input
         setSelectedLayer({});                                   // clear the selected layer
         setIsOpen(false);
     }
@@ -94,7 +91,6 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
         layers.eachLayer((layer) => {
             setSelectedLayer(layer); // Store the selected layer
-            setTextInput(layer.feature.properties.text); // Store the text input for text prompt
             setFeatures(prevFeatures => prevFeatures.map(feat =>
                 feat._leaflet_id === layer._leaflet_id ? layer : feat
             ));
@@ -149,39 +145,11 @@ const MapComponent = ({ textMode, editDetails, features, setFeatures }) => {
 
             <TextInput 
                 textMode={textMode} 
-                textInput={textInput} 
+                featureText={selectedLayer.feature?.properties?.text}
                 onSubmitText={onSubmitText}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
-
-            {/* Text Input Modal */}
-            {/* {textMode &&
-                <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <Form {...form} >
-                            <form onSubmit={form.handleSubmit(onSubmitText)} className="flex flex-col w-full gap-y-4">
-                                <Label htmlFor="name">Description</Label>
-                                <FormField
-                                    control={form.control}
-                                    name="text"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormControl>
-                                                <Textarea placeholder="Add text" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <DialogFooter>
-                                    <Button type="submit" className="bg-primary-dark">Save</Button>
-                                </DialogFooter>
-                            </form>
-                        </Form>
-                    </DialogContent>
-                </Dialog>
-            } */}
         </section>
     );
 }

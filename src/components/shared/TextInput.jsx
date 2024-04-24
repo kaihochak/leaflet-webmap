@@ -16,19 +16,23 @@ const FormSchema = z.object({
     }),
 })
 
-const TextInput = ({textMode, textInput, onSubmitText, isOpen, setIsOpen}) => {
+const TextInput = ({textMode, featureText, onSubmitText, isOpen, setIsOpen}) => {
 
     const form = useForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            text: "",
+            text: featureText || "",
         },
     })
 
-    // make sure the text input is exactly the text of the feature we are editing
     useEffect(() => {
-        form.setValue('text', textInput?.replace(/<br>/g, '\n'))
-    }, [textInput])
+        form.setValue('text', featureText);
+    }, [featureText]);
+
+    const handleFormSubmit = (data) => {
+        onSubmitText(data);
+        form.reset();
+    }
 
     return (
         <div>
@@ -36,7 +40,7 @@ const TextInput = ({textMode, textInput, onSubmitText, isOpen, setIsOpen}) => {
                 <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
                     <DialogContent className="sm:max-w-[425px]">
                         <Form {...form} >
-                            <form onSubmit={form.handleSubmit(onSubmitText)} className="flex flex-col w-full gap-y-4">
+                            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col w-full gap-y-4">
                                 <Label htmlFor="name">Description</Label>
                                 <FormField
                                     control={form.control}
