@@ -4,7 +4,7 @@ This is a dynamic web mapping application developed using React, Vite, and React
 
 [![A Video Walkthrough of the Web Map](https://img.youtube.com/vi/mM_NDzcjylU/maxresdefault.jpg)](https://www.youtube.com/watch?v=mM_NDzcjylU)
 
-Also, check out the [live version] (https://webmap-jade.vercel.app/) of the leaflet web-map deployed using Vercel!
+Also, check out the [live version](https://webmap-jade.vercel.app/) of the leaflet web-map deployed using Vercel!
 
 ## Features
 
